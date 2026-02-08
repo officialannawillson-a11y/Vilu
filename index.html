@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Image + Video Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:Arial;background:#000;color:#fff}
+.container{max-width:420px;margin:auto}
+
+/* IMAGES */
+.image-box{position:relative}
+.image-box img{width:100%;display:none}
+.image-box img.active{display:block}
+
+/* IMAGE CLICK LAYER */
+.image-ad{
+  position:absolute;
+  inset:0;
+  z-index:5;
+}
+
+/* GO BUTTON */
+.go-btn{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#22c55e;
+  color:#000;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  text-align:center;
+  z-index:10;
+}
+
+/* ARROW */
+.arrow{
+  position:fixed;
+  bottom:64px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:34px;
+  animation:bounce 1s infinite;
+  opacity:.9;
+  z-index:9;
+}
+@keyframes bounce{
+  0%,100%{transform:translate(-50%,0)}
+  50%{transform:translate(-50%,-10px)}
+}
+
+/* VIDEO */
+.video-box{display:none;height:100vh;justify-content:center;flex-direction:column}
+.video-wrap{position:relative;height:70vh;border-radius:14px;overflow:hidden}
+video{width:100%;height:100%;object-fit:contain;background:#000}
+.overlay{position:absolute;inset:0;z-index:5}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- IMAGES -->
+<div class="image-box">
+  <img src="IMG1.jpg" class="active">
+  <img src="IMG2.jpg">
+  <img src="IMG3.jpg">
+  <img src="IMG4.jpg">
+
+  <!-- IMAGE AD LAYER -->
+  <div class="image-ad" onclick="imageClick()"></div>
+</div>
+
+<!-- VIDEOS (UNCHANGED) -->
+<div id="videos">
+
+  <div class="video-box" id="v1">
+    <div class="video-wrap">
+      <video id="vid1" muted playsinline controls>
+        <source src="VIDEO1.mp4">
+      </video>
+      <div class="overlay" onclick="videoAd(1,event)"></div>
+    </div>
+  </div>
+
+  <div class="video-box" id="v2">
+    <div class="video-wrap">
+      <video id="vid2" muted playsinline controls>
+        <source src="VIDEO2.mp4">
+      </video>
+      <div class="overlay" onclick="videoAd(2,event)"></div>
+    </div>
+  </div>
+
+  <div class="video-box" id="v3">
+    <div class="video-wrap">
+      <video id="vid3" muted playsinline controls>
+        <source src="VIDEO3.mp4">
+      </video>
+      <div class="overlay" onclick="videoAd(3,event)"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="arrow">👇</div>
+<div class="go-btn" onclick="imageClick()">Go to site</div>
+
+<script>
+/* IMAGE ADS ONLY */
+const imgAds=["IMG_AD_1","IMG_AD_2","IMG_AD_3","IMG_AD_4"];
+let imgIndex=0;
+const imgs=document.querySelectorAll(".image-box img");
+
+function imageClick(){
+  if(imgIndex>=imgs.length) return;
+
+  window.open(imgAds[imgIndex],"_blank");
+
+  imgs[imgIndex].classList.remove("active");
+  imgIndex++;
+
+  if(imgIndex<imgs.length){
+    imgs[imgIndex].classList.add("active");
+  }else{
+    document.querySelector(".image-box").style.display="none";
+    document.querySelector(".arrow").style.display="none";
+    document.querySelector(".go-btn").style.display="none";
+    document.getElementById("videos").style.display="block";
+    document.getElementById("v1").style.display="flex";
+  }
+}
+
+/* VIDEO LOGIC (SAME AS YOUR CODE) */
+const videoAds={
+  1:["V1_AD1","V1_AD2"],
+  2:["V2_AD1","V2_AD2"],
+  3:["V3_AD1","V3_AD2"]
+};
+const videoClicks={};
+
+function videoAd(n,e){
+  e.stopPropagation();
+  if(!videoClicks[n]) videoClicks[n]=0;
+
+  if(videoClicks[n]<2){
+    window.open(videoAds[n][videoClicks[n]],"_blank");
+    videoClicks[n]++;
+    return;
+  }
+
+  document.querySelector("#v"+n+" .overlay").remove();
+  const v=document.getElementById("vid"+n);
+  v.muted=false;
+  v.play();
+
+  if(n<3){
+    setTimeout(()=>{
+      document.getElementById("v"+n).style.display="none";
+      document.getElementById("v"+(n+1)).style.display="flex";
+    },1200);
+  }
+}
+</script>
+
+</body>
+</html>
